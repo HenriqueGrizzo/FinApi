@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 
-const custumers = [];
+const customers = [];
 /**
  * dados necessarios para aplicação
  * cpf - string
@@ -20,12 +20,21 @@ app.post("/account", (request, response) => {
      */
     const {cpf, name} = request.body;
 
-    const id = uuidv4();
+    /**
+     * Validando se já existe um cpf cadastrado igual ao cpf que foi digitado
+     */
+    const customerAlreadyExists = customers.some(
+        (customer) => customer.cpf === cpf
+        );
 
-    custumers.push({
+        if(customerAlreadyExists){
+            return response.status(400).json({error: "Customer already exsists!"})
+        }     
+
+    customers.push({
         cpf,
         name,
-        id,
+        id: uuidv4(),
         statement: []
     })
     return response.status(201).send();
