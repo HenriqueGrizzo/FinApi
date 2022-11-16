@@ -11,7 +11,7 @@ const customers = [];
  * cpf - string
  * name - string
  * id - uuid
- * stamente - [array]
+ * stament - [array]
  */
 
 app.post("/account", (request, response) => {
@@ -38,6 +38,23 @@ app.post("/account", (request, response) => {
         statement: []
     })
     return response.status(201).send();
+})
+
+/**
+ * Buscando o extrato bancario do cliente
+ */
+app.get("/statement/:cpf", (request, response) => {
+    const { cpf } = request.params;
+
+    /**
+     * procura se existe algum customer com o cpf igual ao cpf que foi passado
+     */
+    const customer = customers.find(customer => customer.cpf === cpf)
+
+    /**
+     * retornando se o cpf existe ou não
+     */
+    return response.json(customer.statement)
 })
 
 app.listen(3333);
