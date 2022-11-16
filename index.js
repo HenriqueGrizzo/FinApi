@@ -43,18 +43,25 @@ app.post("/account", (request, response) => {
 /**
  * Buscando o extrato bancario do cliente
  */
-app.get("/statement/:cpf", (request, response) => {
-    const { cpf } = request.params;
+app.get("/statement", (request, response) => {
+    const { cpf } = request.headers;
 
     /**
      * procura se existe algum customer com o cpf igual ao cpf que foi passado
      */
-    const customer = customers.find(customer => customer.cpf === cpf)
+    const customer = customers.find((customer) => customer.cpf === cpf);
+
+    /**
+     * Verificando se o cpf no qual está buscando o extrato existe
+     */
+    if(!customer) {
+        return response.status(400).json({ Error: "Customer not found" });
+    }
 
     /**
      * retornando se o cpf existe ou não
      */
-    return response.json(customer.statement)
+    return response.json(customer.statement);
 })
 
 app.listen(3333);
