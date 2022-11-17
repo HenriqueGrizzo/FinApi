@@ -78,4 +78,25 @@ app.get("/statement", verifyIfExistsAccountCPF, (request, response) => {
     return response.json(customer.statement);
 })
 
+/**
+ * Criando o deposito e verificando se a conta na qual vai ser depositado existe
+ */
+app.post("/deposit",verifyIfExistsAccountCPF, (request, response) =>{
+    const { description, amount } = request.body;
+
+    const { customer }  = request;
+
+    const statementOperation = {
+        description,
+        amount,
+        created_at: new Date(),
+        type: "credit"
+    }
+
+    customer.statement.push(statementOperation);
+
+    return response.status(201).send();
+    
+})
+
 app.listen(3333);
