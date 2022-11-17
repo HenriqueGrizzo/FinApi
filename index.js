@@ -14,7 +14,7 @@ const customers = [];
  * stament - [array]
  */
 
-//middleware
+//middleware para testar se o cpf é valido
 function verifyIfExistsAccountCPF(request, response, next) {
     const { cpf } = request.headers;
     
@@ -33,6 +33,21 @@ function verifyIfExistsAccountCPF(request, response, next) {
         request.customer = customer;
     
         return next();
+}
+
+/**
+ * função para saber o saldo
+ */
+function getBalance(statement) {
+    const balance = statement.reduce((acc, operation) =>{
+        if(operation.type === 'credit') {
+            acc + operation.amount
+        }else {
+            acc - operation.amount
+        }
+    }, 0)
+
+    return balance;
 }
 
 app.post("/account", (request, response) => {
@@ -99,4 +114,26 @@ app.post("/deposit",verifyIfExistsAccountCPF, (request, response) =>{
     
 })
 
+/**
+ * Criando saque e verificando se a conta na qual o dinheiro vai ser sacado existe e se o saldo for suficiente para o saque
+ */
+app.post("/withdraw", verifyIfExistsAccountCPF, (request, response) => {
+    const { amount } = request.body;
+    const { customer } = request;
+
+    const balance = getBalance(customer.statement);
+
+    if(balance < amount) {
+        return response.status(400).json({ Error: "Caloteiro!"})
+    }
+
+    const statementOperation = {
+        amount,
+        created_at: new Date(),
+        type: "credit"
+    }
+    customer.statement.push(statementOperation)
+
+    return response.status(201).send();
+})
 app.listen(3333);
