@@ -138,7 +138,7 @@ app.post("/withdraw", verifyIfExistsAccountCPF, (request, response) => {
 })
 
 /**
- * Buscando o extrato bancario por data
+ * Buscando o extrato bancario por data e verificando se o cpf que vai ser atualizado é valido
  */
 app.get("/statement/date", verifyIfExistsAccountCPF, (request, response) => {
     const { customer } = request;
@@ -153,5 +153,27 @@ app.get("/statement/date", verifyIfExistsAccountCPF, (request, response) => {
         (statement) => statement.created_at.toDateString() === new Date(dateFormat).toDateString()
     )
     return response.json(statement);
+})
+
+/**
+ * atualiza a conta e verificando se a conta que vai ser atualizada possui um cpf válido
+ */
+app.put("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const {  name } = request.body;
+    const { customer } = request;
+
+    customer.name = name;
+
+    return response.status(201).send();
+})
+
+/**
+ * Obtendo dados da conta do cliente 
+ */
+
+app.get("/account", verifyIfExistsAccountCPF, (request, response) =>{
+    const { customer } = request;
+
+    return response.json(customer)
 })
 app.listen(3333);
